@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var navbarHeight = document.querySelector('.navbar').offsetHeight;
+            document.body.style.paddingTop = navbarHeight + 'px';
+        });
+    </script>
+    <style>
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-body button {
+            margin-bottom: 10px;
+        }
+        .filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-form .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .loading-spinner {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        .d-none {
+            display: none;
+        }
+        .intro-text {
+            margin-bottom: 20px;
+        }
+        .stats-container {
+            margin-bottom: 20px;
+        }
+        .stats-container button {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="img/logo.png" alt="Company Logo" style="height: 40px; margin-right: 10px;">
+            Attendance System
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php">Manage Attendances</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="manage_users.html">Manage Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="form.html">Upload File</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Manage Users</h1>
+        <p class="intro-text">Welcome to the user management section. Here you can add new users, view and manage existing user records, and perform various actions to keep your user database up to date.</p>
+        
+        <div class="stats-container">
+            <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#statsContent" aria-expanded="false" aria-controls="statsContent">
+                View User Statistics
+            </button>
+            <div class="collapse" id="statsContent">
+                <div class="card card-body">
+                    <p>Total Users: <span id="totalUsers">0</span></p>
+                    <p>Present Users: <span id="presentUsers">0</span></p>
+                    <p>Null Users: <span id="absentUsers">0</span></p>
+                    <p>Izin Users: <span id="IzinUsers">0</span></p>
+                    <p>Sakit Users: <span id="sakitUsers">0</span></p>
+                    <p>Cuti Users: <span id="CutiUsers">0</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <h2>Filter Users</h2>
+        <div class="filter-form">
+            <div class="form-group">
+                <label for="userIdFilter">User ID:</label>
+                <input type="text" id="userIdFilter" class="form-control" placeholder="Enter user ID">
+            </div>
+            <div class="form-group">
+                <label for="nameFilter">Full Name:</label>
+                <input type="text" id="nameFilter" class="form-control" placeholder="Enter full name">
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <h2>User Records</h2>
+            <div id="users" class="table-container">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name</th>
+                            <th>Actions 
+                                <button class="btn btn-sm btn-danger float-right" onclick="deleteAllUsers()">Delete All</button>
+                                <button class="btn btn-sm btn-primary float-right mr-2" onclick="window.location.href='add_user.html'">Add New User</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div id="loading" class="loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+        <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        function fetchUsers() {
+            const userIdFilter = document.getElementById('userIdFilter').value;
+            const nameFilter = document.getElementById('nameFilter').value;
+
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('error-message').classList.add('d-none');
+
+            fetch(`../fetch_users.php?user_id=${userIdFilter}&name=${nameFilter}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+
+                    const tableBody = document.getElementById('userTableBody');
+                    tableBody.innerHTML = ''; // Clear existing rows
+
+                    let totalUsers = 0;
+                    let presentUsers = 0;
+                    let absentUsers = 0;
+                    let IzinUsers = 0;
+                    let sakitUsers = 0;
+                    let CutiUsers = 0;
+
+                    if (data.length === 0) {
+                        const row = tableBody.insertRow();
+                        row.innerHTML = `<td colspan="3" class="text-center">No user records found.</td>`;
+                    } else {
+                        data.forEach(user => {
+                            totalUsers++;
+                            if (user.attendance_status === "1" || user.attendance_status === "16") {
+                                presentUsers++;
+                            } else {
+                                absentUsers++;
+                            }
+                            const row = tableBody.insertRow();
+                            row.innerHTML = `
+                                <td>${user.user_id}</td>
+                                <td>${user.full_name}</td>
+                                <td>
+                                    <button onclick="window.location.href='user_statistics.html?user_id=${user.user_id}'" class="btn btn-primary">View</button>
+                                    <button class="btn btn-sm btn-danger" onclick="removeUser(${user.user_id})">Delete</button>
+                                </td>`;
+                        });
+                    }
+
+                    document.getElementById('totalUsers').textContent = totalUsers;
+                    document.getElementById('presentUsers').textContent = presentUsers;
+                    document.getElementById('absentUsers').textContent = absentUsers;
+                    document.getElementById('IzinUsers').textContent = IzinUsers;
+                    document.getElementById('sakitUsers').textContent = sakitUsers;
+                    document.getElementById('CutiUsers').textContent = CutiUsers;
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error-message').classList.remove('d-none');
+                    document.getElementById('error-message').textContent = 'Failed to load user records. Please try again later.';
+                    console.error('Error fetching user records:', error);
+                });
+        }
+
+        function displayUser(user_id) {
+            window.location.href = `user_statistics.html?user_id=${user_id}`;
+        }
+
+        function removeUser(user_id) {
+            if (confirm(`Are you sure you want to remove the user with ID ${user_id}?`)) {
+                fetch(`../manage_attendance.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=manage_users&user_id=${user_id}`,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        fetchUsers();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing user:', error);
+                    alert('Failed to remove user. Please try again later.');
+                });
+            }
+        }
+
+        function deleteAllUsers() {
+            if (confirm('Are you sure you want to delete all users?')) {
+                fetch(`../manage_attendance.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=delete_all_users`,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        fetchUsers();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting all users:', error);
+                    alert('Failed to delete all users. Please try again later.');
+                });
+            }
+        }
+
+        document.getElementById('userIdFilter').addEventListener('input', debounce(fetchUsers, 500));
+        document.getElementById('nameFilter').addEventListener('input', debounce(fetchUsers, 500));
+
+        fetchUsers(); // Initial fetch
+    </script>
+</body>
+</html>

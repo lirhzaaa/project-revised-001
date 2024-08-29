@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var navbarHeight = document.querySelector('.navbar').offsetHeight;
+            document.body.style.paddingTop = navbarHeight + 'px';
+        });
+        </script>
+    <style>
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .card {
+            flex: 1;
+            margin: 10px;
+            min-width: 300px;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 400px;
+            width: 400px;
+        }
+        .navbar {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+        }   
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="img/logo.png" alt="Company Logo" style="height: 40px; margin-right: 10px;">
+            Attendance System
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php">Manage Attendances</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="manage_users.html">Manage Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="form.html">Upload File</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+
+    <!-- Dashboard Content -->
+    <div class="container mt-4">
+        <h1>Dashboard</h1>
+        <div class="card-container">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Records</h5>
+                    <p class="card-text" id="totalRecords"></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Present</h5>
+                    <p class="card-text" id="present"></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Null (-)</h5>
+                    <p class="card-text" id="absent"></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Izin</h5>
+                    <p class="card-text" id="Izin"></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Sakit</h5>
+                    <p class="card-text" id="sakit"></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Cuti</h5>
+                    <p class="card-text" id="Cuti"></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Late</h5>
+                    <p class="card-text" id="late"></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">On Time</h5>
+                    <p class="card-text" id="onTime"></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Late Statistics</h5>
+                    <p class="card-text" id="lateStatistics"></p>
+                </div>
+            </div>
+        </div>
+        <!-- Chart Container Row -->
+        <div class="row mt-4">
+            <!-- Pie Chart -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Line Chart -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="dateWiseChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStatistics();
+        });
+    
+        function fetchStatistics() {
+            fetch('../fetch_statistics.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const stats = data.statistics;
+    
+                        document.getElementById('totalRecords').textContent = stats.total_records;
+                        document.getElementById('present').textContent = stats.present;
+                        document.getElementById('absent').textContent = stats.absent;
+                        document.getElementById('Izin').textContent = stats.Izin;
+                        document.getElementById('sakit').textContent = stats.sakit;
+                        document.getElementById('Cuti').textContent = stats.Cuti;
+                        document.getElementById('late').textContent = stats.late;
+                        document.getElementById('onTime').textContent = stats.on_time;
+    
+                        const lateStatistics = `
+                            Total Late: ${stats.late}<br>
+                            <ul>
+                                <li>15-30 minutes late: ${stats.late_15_30}</li>
+                                <li>30-60 minutes late: ${stats.late_30_60}</li>
+                                <li>More than an hour late: ${stats.late_60}</li>
+                            </ul>
+                        `;
+                        document.getElementById('lateStatistics').innerHTML = lateStatistics;
+    
+                        const ctx = document.getElementById('attendanceChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: ['Present', 'Absent', 'Izin', 'Sakit', 'Cuti', 'Late', 'On Time'],
+                                datasets: [{
+                                    data: [
+                                        stats.present,
+                                        stats.absent,
+                                        stats.Izin,
+                                        stats.sakit,
+                                        stats.Cuti,
+                                        stats.late,
+                                        stats.on_time
+                                    ],
+                                    backgroundColor: ['#4CAF50', '#FF5733', '#FFC107', '#2196F3', '#1E201E', '#800000', '#86AB89'],
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Attendance Statistics'
+                                    }
+                                }
+                            }
+                        });
+    
+                        // Prepare date-wise data for the line chart
+                        const dateWiseLabels = stats.date_wise.map(item => item.date);
+                        const lateData = stats.date_wise.map(item => item.late_count);
+                        const onTimeData = stats.date_wise.map(item => item.on_time_count);
+    
+                        const dateWiseCtx = document.getElementById('dateWiseChart').getContext('2d');
+                        new Chart(dateWiseCtx, {
+                            type: 'line',
+                            data: {
+                                labels: dateWiseLabels,
+                                datasets: [
+                                    {
+                                        label: 'Late',
+                                        data: lateData,
+                                        borderColor: '#FF5733',
+                                        fill: false
+                                    },
+                                    {
+                                        label: 'On Time',
+                                        data: onTimeData,
+                                        borderColor: '#2196F3',
+                                        fill: false
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Date-wise Attendance Statistics'
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Date'
+                                        }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Count'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        console.error('Error fetching statistics:', data.message);
+                    }
+                })
+                .catch(error => console.error('Fetch error:', error));
+        }
+    </script>
+    
+</body>
+</html>

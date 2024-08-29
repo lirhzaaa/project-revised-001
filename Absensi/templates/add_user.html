@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add New User</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var navbarHeight = document.querySelector('.navbar').offsetHeight;
+        document.body.style.paddingTop = navbarHeight + 'px';
+    });
+</script>
+<style>
+    .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+</style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="img/logo.png" alt="Company Logo" style="height: 40px; margin-right: 10px;">
+            Attendance System
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php">Manage Attendances</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="manage_users.html">Manage Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="form.html">Upload File</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+  <div class="container mt-4">
+    <h2>Add New User</h2>
+    <form action="../add_user.php" method="post">
+      <div class="form-group">
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" name="user_id" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="full_name">Full Name:</label>
+        <input type="text" id="full_name" name="full_name" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Add User</button>
+    </form>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,143 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f9fa;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+}
+
+.custom-file-upload input[type="file"] {
+    display: none;
+}
+
+#file-name {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.export-button {
+    display: inline-block;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+
+.export-button:hover {
+    background-color: #218838;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    padding: 5px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Add styles for the navbar */
+.navbar {
+    margin-bottom: 20px;
+}
+
+.navbar-nav .nav-link {
+    margin-right: 10px;
+}
+
+/* Center the card vertically and horizontally */
+.container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-upload {
+    position: relative;
+    display: inline-block;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-file-upload:hover {
+    background-color: #f0f0f0;
+}
+
+/* New styles for button alignment and spacing */
+.btn-container {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    margin-top: 20px; /* Space above the buttons */
+}
+
+.modal-body button {
+    margin-bottom: 10px; /* Space between modal buttons */
+}
